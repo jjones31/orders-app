@@ -1,0 +1,22 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+}
+group = 'me.bobjones'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+}
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+}
