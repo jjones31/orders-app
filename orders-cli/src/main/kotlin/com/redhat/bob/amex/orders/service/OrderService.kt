@@ -4,6 +4,7 @@ import com.redhat.bob.amex.orders.domain.Catalog
 import com.redhat.bob.amex.orders.domain.Offers
 import com.redhat.bob.amex.orders.domain.Order
 import com.redhat.bob.amex.orders.infra.messaging.OrderCompleted
+import com.redhat.bob.amex.orders.infra.messaging.OrderFailed
 import java.util.*
 import kotlin.NoSuchElementException
 
@@ -12,7 +13,7 @@ import kotlin.NoSuchElementException
  * and submitting the order.
  */
 class OrderService(private val catalog: Catalog = Catalog(),
-                   private val offers: Offers = Offers(),
+                   private val offers: Offers = Offers(catalog),
                    notificationService: NotificationService
 ) : Observable() {
 
@@ -38,8 +39,13 @@ class OrderService(private val catalog: Catalog = Catalog(),
 
         // emit the event to subscribers/observers
         setChanged()
-        notifyObservers(OrderCompleted(order, total / 100.0,
-            discountedTotal / 100.0, totalDiscounts / 100.0))
+
+        if (order.isOutOfStock) {
+            notifyObservers(OrderFailed("OutOfStock"))
+        } else {
+            notifyObservers(OrderCompleted(order, total / 100.0,
+                discountedTotal / 100.0, totalDiscounts / 100.0))
+        }
     }
 
     private fun buildValidOrder(items: List<String>?): Order {
@@ -48,6 +54,12 @@ class OrderService(private val catalog: Catalog = Catalog(),
             try {
                 // Ensure the item name is in the catalog.
                 val product = catalog.findByName(it.trim())
+
+                if (product.quantity >= 1) {
+                    catalog.reduceStock(product.name, 1)
+                } else {
+                    order.isOutOfStock(product.name)
+                }
 
                 // Add the product to the order.
                 order.items.add(product)

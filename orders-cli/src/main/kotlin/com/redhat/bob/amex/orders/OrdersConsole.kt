@@ -1,5 +1,6 @@
 package com.redhat.bob.amex.orders
 
+import com.redhat.bob.amex.orders.infra.messaging.OrderFailed
 import com.redhat.bob.amex.orders.infra.messaging.OrderStatusNotification
 import com.redhat.bob.amex.orders.service.NotificationService
 import com.redhat.bob.amex.orders.service.OrderService
@@ -31,6 +32,8 @@ class OrdersConsole(private val orderService: OrderService,
                             "Price: \$${arg.total}\n" +
                             "Discounts: \$${arg.totalDiscounts}\n" +
                             "TOTAL: \$${arg.discountedTotal}\n")
+                } else if (arg is OrderFailed) {
+                    outputProcessor("Your order has failed. Reason: ${arg.reason}")
                 }
             }
         }

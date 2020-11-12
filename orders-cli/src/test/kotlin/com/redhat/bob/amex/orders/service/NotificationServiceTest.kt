@@ -11,6 +11,7 @@ import java.time.LocalDate
 internal class NotificationServiceTest {
 
     private val notificationService = NotificationService()
+    private val catalog = Catalog()
 
     @Test
     fun notifyClients() {
@@ -21,7 +22,7 @@ internal class NotificationServiceTest {
             assertEquals("shipping", it.status)
             assertEquals(0.25, it.totalDiscounts)
         })
-        notificationService.notifyClients(OrderCompleted(Order(mutableListOf(Catalog.APPLE)),
+        notificationService.notifyClients(OrderCompleted(Order(mutableListOf(catalog.APPLE)),
             1.25, 1.00, 0.25))
     }
 }
