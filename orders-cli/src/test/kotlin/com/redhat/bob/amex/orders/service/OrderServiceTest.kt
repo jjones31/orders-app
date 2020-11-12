@@ -1,37 +1,73 @@
 package com.redhat.bob.amex.orders.service
 
-import com.redhat.bob.amex.orders.domain.Order
-import com.redhat.bob.amex.orders.domain.Product
+import com.redhat.bob.amex.orders.infra.messaging.OrderStatusNotification
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import java.util.*
+
+class TestObserver(val test: (event: OrderStatusNotification) -> Unit) : Observer {
+    override fun update(o: Observable?, arg: Any?) {
+        when(o) {
+            is NotificationService -> {
+                if (arg is OrderStatusNotification) {
+                    test(arg)
+                }
+            }
+        }
+    }
+}
 
 internal class OrderServiceTest {
 
-    private val orderService = OrderService()
+    private val notificationService = NotificationService()
+    private val orderService = OrderService(notificationService = notificationService)
 
     @Test
     fun shouldBe205() {
-        assertEquals(1.45, orderService.submitOrder(listOf("apple", "apple", "orange", "apple")))
+        notificationService.addObserver(TestObserver {
+            assertEquals(2.05, it.total)
+            assertEquals(1.45, it.discountedTotal)
+        })
+        orderService.submitOrder(listOf("apple", "apple", "orange", "apple"))
     }
 
     @Test
     fun shouldBe0() {
-        assertEquals(0.0, orderService.submitOrder(listOf()))
+        notificationService.addObserver(TestObserver {
+            assertEquals(0.0, it.total)
+            assertEquals(0.0, it.discountedTotal)
+        })
+        orderService.submitOrder(listOf())
     }
 
     @Test
     fun shouldBe0IfItemIsUnknown() {
-        assertEquals(0.0, orderService.submitOrder(listOf("carrot")))
+        notificationService.addObserver(TestObserver {
+            assertEquals(0.0, it.total)
+            assertEquals(0.0, it.discountedTotal)
+        })
+        orderService.submitOrder(listOf("carrot"))
     }
 
     @Test
     fun shouldBe60() {
-        assertEquals(0.60, orderService.submitOrder(listOf("apple")))
+        notificationService.addObserver(TestObserver {
+
+            println(it)
+
+            assertEquals(0.60, it.total)
+            assertEquals(0.60, it.discountedTotal)
+        })
+        orderService.submitOrder(listOf("apple"))
     }
 
     @Test
     fun shouldBe25() {
-        assertEquals(0.25, orderService.submitOrder(listOf("orange")))
+        notificationService.addObserver(TestObserver {
+            assertEquals(0.25, it.total)
+            assertEquals(0.25, it.discountedTotal)
+        })
+        orderService.submitOrder(listOf("orange"))
     }
 }

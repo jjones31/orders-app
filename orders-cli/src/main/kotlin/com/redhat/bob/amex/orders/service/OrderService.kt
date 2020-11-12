@@ -3,16 +3,24 @@ package com.redhat.bob.amex.orders.service
 import com.redhat.bob.amex.orders.domain.Catalog
 import com.redhat.bob.amex.orders.domain.Offers
 import com.redhat.bob.amex.orders.domain.Order
+import com.redhat.bob.amex.orders.infra.messaging.OrderCompleted
+import java.util.*
+import kotlin.NoSuchElementException
 
 /**
  * The OrderService is responsible for taking raw input, creating a valid order
  * and submitting the order.
  */
 class OrderService(private val catalog: Catalog = Catalog(),
-                   private val offers: Offers = Offers()
-) {
+                   private val offers: Offers = Offers(),
+                   notificationService: NotificationService
+) : Observable() {
 
-    fun submitOrder(items: List<String>?): Double {
+    init {
+        addObserver(notificationService)
+    }
+
+    fun submitOrder(items: List<String>?) {
 
         var total = 0.0
         val order = buildValidOrder(items)
@@ -22,11 +30,16 @@ class OrderService(private val catalog: Catalog = Catalog(),
             total += it.price
         }
 
-        // handle the discounts and subtract any from total
-        total -= offers.handleDiscounts(order)
+        // handle the discounts
+        val totalDiscounts = offers.handleDiscounts(order)
 
-        // Convert the total into a value with 2 decimals.
-        return total / 100.0
+        // subtract all discounts from total
+        val discountedTotal = total - totalDiscounts
+
+        // emit the event to subscribers/observers
+        setChanged()
+        notifyObservers(OrderCompleted(order, total / 100.0,
+            discountedTotal / 100.0, totalDiscounts / 100.0))
     }
 
     private fun buildValidOrder(items: List<String>?): Order {
