@@ -1,40 +1,64 @@
 package com.redhat.bob.amex.orders
 
+import com.redhat.bob.amex.orders.service.NotificationService
+import com.redhat.bob.amex.orders.service.OrderService
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class OrdersConsoleTest {
 
     @Test
     fun shouldGive85TotalforOrangeAndApple() {
         var output = ""
-        val console = OrdersConsole(inputProcessor = { mutableListOf("orange", "apple") },
+
+        val notificationService = NotificationService()
+        val orderService = OrderService(notificationService = notificationService)
+
+        val console = OrdersConsole(orderService = orderService,
+            inputProcessor = { mutableListOf("orange", "apple") },
             outputProcessor = { output = it })
+
+        notificationService.addObserver(console)
 
         console.run(false)
 
-        assertEquals("Total: \$0.85", output)
+        assertTrue(output.contains("TOTAL: \$0.85"))
     }
 
     @Test
     fun shouldGive85TotalWithCrazySpaces() {
         var output = ""
-        val console = OrdersConsole(inputProcessor = { mutableListOf("orange     ", "   apPle") },
+
+        val notificationService = NotificationService()
+        val orderService = OrderService(notificationService = notificationService)
+
+        val console = OrdersConsole(orderService,
+            inputProcessor = { mutableListOf("orange     ", "   apPle") },
             outputProcessor = { output = it })
+
+        notificationService.addObserver(console)
 
         console.run(false)
 
-        assertEquals("Total: \$0.85", output)
+        assertTrue(output.contains("TOTAL: \$0.85"))
     }
 
     @Test
     fun shouldGiveNoOutputforNullList() {
         var output = ""
-        val console = OrdersConsole(inputProcessor = { null },
+
+        val notificationService = NotificationService()
+        val orderService = OrderService(notificationService = notificationService)
+
+        val console = OrdersConsole(orderService,
+            inputProcessor = { null },
             outputProcessor = { output = it })
+
+        notificationService.addObserver(console)
 
         console.run(false)
 
-        assertEquals("Total: \$0.0", output)
+        assertTrue(output.contains("TOTAL: \$0.0"))
     }
 }

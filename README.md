@@ -17,3 +17,10 @@ The OrderService now will calculate a discount based on the number of apples and
 **Decisions**
 * Started to implement a chain of responsibility, but this didn't really fit the use case. I opted to just have a list of functions, each representing the strategy to calculate an offer. 
 * I decided to make Offers a domain object instead of an application service. This was because the term "offer" was used in the description.
+
+## Step 3: Notification Service
+Incorporate a notification service that subscribes to events from the OrderService. Furthermore, the console should subscribe to notifications. 
+
+**Decisions**
+* I decided to continue with a monolithic application. Instead of splitting anything out into separate services, I utilzed the builtin Observer pattern. The seemed easiest given the time constraint as well as no scaling requirements. 
+* I added an infra package to represent the infrastructure layer as you would in DDD or clean architecture. 
