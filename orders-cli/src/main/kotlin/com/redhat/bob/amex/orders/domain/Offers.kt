@@ -3,7 +3,7 @@ package com.redhat.bob.amex.orders.domain
 // Create OfferHandler lambda typealias to generate the discount from an order
 typealias OfferHandler = (order: Order) -> Int
 
-class Offers {
+class Offers(private val catalog: Catalog) {
 
     // A list of all discount handlers to process the order
     private val discountHandlers = mutableListOf<OfferHandler>(::orangeOffer, ::appleBuyOneGetOne)
@@ -19,15 +19,15 @@ class Offers {
 
     // OfferHandler for buying 3 oranges, get one free.
     private fun orangeOffer(order: Order) : Int {
-        val numberOfOranges = order.items.filter { it == Catalog.ORANGE }.count()
+        val numberOfOranges = order.items.filter { it.name.toUpperCase() == catalog.ORANGE.name.toUpperCase()}.count()
         val numberOfDiscounts = numberOfOranges / 3
-        return numberOfDiscounts * Catalog.ORANGE.price
+        return numberOfDiscounts * catalog.ORANGE.price
     }
 
     // OfferHandler for buying 2 apples, get one free.
     private fun appleBuyOneGetOne(order: Order) : Int {
-        val numberOfApples = order.items.filter { it == Catalog.APPLE }.count()
+        val numberOfApples = order.items.filter { it.name.toUpperCase() == catalog.APPLE.name.toUpperCase() }.count()
         val numberOfDiscounts = numberOfApples / 2
-        return numberOfDiscounts * Catalog.APPLE.price
+        return numberOfDiscounts * catalog.APPLE.price
     }
 }

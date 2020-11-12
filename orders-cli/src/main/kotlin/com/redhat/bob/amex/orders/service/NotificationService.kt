@@ -1,6 +1,7 @@
 package com.redhat.bob.amex.orders.service
 
 import com.redhat.bob.amex.orders.infra.messaging.OrderCompleted
+import com.redhat.bob.amex.orders.infra.messaging.OrderFailed
 import com.redhat.bob.amex.orders.infra.messaging.OrderStatusNotification
 import java.time.LocalDate
 import java.util.*
@@ -9,6 +10,13 @@ import java.util.*
  * Service that facilitates propagating notifications to clients.
  */
 class NotificationService : Observer, Observable() {
+
+    fun notifyClientsOfOutOfStock(event: OrderFailed) {
+
+        // Add 10 days from today as fake shipping calculations
+        setChanged()
+        notifyObservers(event)
+    }
 
     fun notifyClients(event: OrderCompleted) {
 
@@ -23,6 +31,8 @@ class NotificationService : Observer, Observable() {
             is OrderService -> {
                 if (arg is OrderCompleted) {
                     notifyClients(arg)
+                } else if (arg is OrderFailed) {
+                    notifyClientsOfOutOfStock(arg)
                 }
             }
         }

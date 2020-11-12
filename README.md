@@ -24,3 +24,10 @@ Incorporate a notification service that subscribes to events from the OrderServi
 **Decisions**
 * I decided to continue with a monolithic application. Instead of splitting anything out into separate services, I utilzed the builtin Observer pattern. The seemed easiest given the time constraint as well as no scaling requirements. 
 * I added an infra package to represent the infrastructure layer as you would in DDD or clean architecture. 
+
+## Step 4: Inventory
+Incorporate add the ability to have a stock of items. 
+
+**Decisions**
+* I was going to go all out and create a memory-based impl of a repository, but don't have enough time. 
+* Made the choice to add the quantity to the product entity, but I think this doesn't belong here in the long run. 

@@ -5,10 +5,8 @@ package com.redhat.bob.amex.orders.domain
  */
 class Catalog {
 
-    companion object {
-        var APPLE: Product = Product("apple", 60)
-        var ORANGE: Product = Product("orange", 25)
-    }
+    var APPLE: Product = Product("apple", 60, 10)
+    var ORANGE: Product = Product("orange", 25, 10)
 
     // create the product inventory for the catalog
     // NOTE: Using USD CENTS to represent the price. This is a quick and dirty way of
@@ -19,5 +17,8 @@ class Catalog {
 
     fun findByName(name: String): Product =
         inventory.first { name.toUpperCase() == it.name.toUpperCase() }.copy()
+
+    fun reduceStock(name: String, amount: Int) =
+        inventory.first { name.toUpperCase() == it.name.toUpperCase() }.remove(amount)
 
 }

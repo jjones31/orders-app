@@ -1,5 +1,6 @@
 package com.redhat.bob.amex.orders.service
 
+import com.redhat.bob.amex.orders.infra.messaging.OrderFailed
 import com.redhat.bob.amex.orders.infra.messaging.OrderStatusNotification
 import org.junit.jupiter.api.Test
 
@@ -26,6 +27,9 @@ internal class OrderServiceTest {
     @Test
     fun shouldBe205() {
         notificationService.addObserver(TestObserver {
+
+            println(it)
+
             assertEquals(2.05, it.total)
             assertEquals(1.45, it.discountedTotal)
         })
@@ -53,9 +57,6 @@ internal class OrderServiceTest {
     @Test
     fun shouldBe60() {
         notificationService.addObserver(TestObserver {
-
-            println(it)
-
             assertEquals(0.60, it.total)
             assertEquals(0.60, it.discountedTotal)
         })

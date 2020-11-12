@@ -61,4 +61,23 @@ internal class OrdersConsoleTest {
 
         assertTrue(output.contains("TOTAL: \$0.0"))
     }
+
+    @Test
+    fun shouldGiveOutOfStockFailure() {
+        var output = ""
+
+        val notificationService = NotificationService()
+        val orderService = OrderService(notificationService = notificationService)
+
+        val console = OrdersConsole(orderService,
+            inputProcessor = { mutableListOf("apple", "apple", "apple", "apple","apple",
+                "apple","apple", "apple","apple", "apple", "apple") },
+            outputProcessor = { output = it })
+
+        notificationService.addObserver(console)
+
+        console.run(false)
+
+        assertEquals("Your order has failed. Reason: OutOfStock", output)
+    }
 }
