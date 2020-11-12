@@ -9,3 +9,11 @@ The orders-cli folder contains a Kotlin application in which a user can submit a
 * Output of the CLI is just the total
 * Anything outside of "apple" or "orange" did not add to the price, throw an exception, or notify the user of the product not being valid.
 * I created a domain model, however, I did not define any aggregate roots or entities. Everything besides the OrderService was a value object. 
+
+
+## Step 2: Simple Offers
+The OrderService now will calculate a discount based on the number of apples and oranges in the order. Apples are buy one get one free and oranges are buy 2 get the third free. 
+
+**Decisions**
+* Started to implement a chain of responsibility, but this didn't really fit the use case. I opted to just have a list of functions, each representing the strategy to calculate an offer. 
+* I decided to make Offers a domain object instead of an application service. This was because the term "offer" was used in the description.
