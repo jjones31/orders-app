@@ -1,13 +1,16 @@
 package com.redhat.bob.amex.orders.service
 
 import com.redhat.bob.amex.orders.domain.Catalog
+import com.redhat.bob.amex.orders.domain.Offers
 import com.redhat.bob.amex.orders.domain.Order
 
 /**
  * The OrderService is responsible for taking raw input, creating a valid order
  * and submitting the order.
  */
-class OrderService(private val catalog: Catalog = Catalog()) {
+class OrderService(private val catalog: Catalog = Catalog(),
+                   private val offers: Offers = Offers()
+) {
 
     fun submitOrder(items: List<String>?): Double {
 
@@ -19,8 +22,11 @@ class OrderService(private val catalog: Catalog = Catalog()) {
             total += it.price
         }
 
+        // handle the discounts and subtract any from total
+        total -= offers.handleDiscounts(order)
+
         // Convert the total into a value with 2 decimals.
-        return total.toDouble() / 100.0
+        return total / 100.0
     }
 
     private fun buildValidOrder(items: List<String>?): Order {
@@ -36,6 +42,6 @@ class OrderService(private val catalog: Catalog = Catalog()) {
                 // TODO: Figure out the business rule when product specified doesn't exist.
             }
         }
-        return order;
+        return order
     }
 }

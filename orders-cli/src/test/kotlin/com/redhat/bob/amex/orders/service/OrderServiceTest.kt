@@ -12,7 +12,7 @@ internal class OrderServiceTest {
 
     @Test
     fun shouldBe205() {
-        assertEquals(2.05, orderService.submitOrder(listOf("apple", "apple", "orange", "apple")))
+        assertEquals(1.45, orderService.submitOrder(listOf("apple", "apple", "orange", "apple")))
     }
 
     @Test
